@@ -1,0 +1,5 @@
+﻿{
+  "displayName":"Plot Renderer Demo",
+  "description": "Create and display various plot types using the PlotRenderer.",
+  "createSeparatePackage": false
+}

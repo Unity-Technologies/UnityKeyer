@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/KeyerResultVanilla.unity
+    guid: e7de9e432628fb44e93103a35e45457b
+  - enabled: 1
+    path: Assets/Scenes/KeyerResultWithCrop.unity
+    guid: e86428c11912e4a45bcce8f97d0c531b
+  - enabled: 1
+    path: Assets/Scenes/KeyerColorDistanceCoreMask.unity
+    guid: b16a00f17621f45e79bab15fce44db15
+  - enabled: 1
+    path: Assets/Scenes/KeyerCoreMaskWithErode.unity
+    guid: 775afcca452354a2e8d106fd127df8f1
+  - enabled: 1
+    path: Assets/Scenes/KeyerResultWithSoftMask.unity
+    guid: 64c5778ec36bd144fb6bf568f7ca2764
+  - enabled: 1
+    path: Assets/Scenes/KeyerDespillFix.unity
+    guid: 98d74d0d2388cd94784266f7f21bd373
+  m_configObjects: {}

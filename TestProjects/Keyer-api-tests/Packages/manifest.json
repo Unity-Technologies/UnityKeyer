@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "com.unity.ai.navigation": "1.1.1",
+    "com.unity.coding": "0.1.0-preview.24",
+    "com.unity.collections": "1.2.4",
+    "com.unity.feature.development": "1.0.1",
+    "com.unity.ide.rider": "3.0.18",
+    "com.unity.ide.visualstudio": "2.0.17",
+    "com.unity.ide.vscode": "1.2.5",
+    "com.unity.media.keyer": "file:../../../Packages/com.unity.media.keyer",
+    "com.unity.media.keyer.graphics-tests": "file:../../../Packages/com.unity.media.keyer.graphics-tests",
+    "com.unity.test-framework": "1.1.33",
+    "com.unity.modules.screencapture": "1.0.0"
+  }
+}
