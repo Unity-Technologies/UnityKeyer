@@ -1,0 +1,20 @@
+﻿#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+
+#pragma kernel ColorDistance
+#define GROUP_SIZE 16
+
+Texture2D<float3> _Input;
+RWTexture2D<float> _Output;
+float4 _ColorDistanceParams;
+
+#define _KeyChroma _ColorDistanceParams.xy
+#define _Threshold _ColorDistanceParams.zw
+
+[numthreads(GROUP_SIZE, GROUP_SIZE, 1)]
+void ColorDistance(uint3 id : SV_DispatchThreadID)
+{
+    const float3 input = SAMPLE_RGB(_Input, id.xy);
+    float2 inputChroma = Rgb2Yuv(input).yz;
+	float dist = distance(_KeyChroma, inputChroma);
+    _Output[id.xy] = saturate(InvLerp(_Threshold.x, _Threshold.y, dist));
+}

@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.unity.media.keyer/Editor/UI/ToggleFoldout/ToggleFoldout.uss?fileID=7433441132597879392&amp;guid=7553d1818a7ea46c1a25b688d9ac1135&amp;type=3#ToggleFoldout" />
+    <ui:VisualElement name="header-container" class="header-back-color" style="flex-direction: row;">
+        <ui:Toggle value="true" name="dropdown-toggle" class="unity-foldout__toggle" style="width: 15px; margin-left: 3px; margin-right: 1px;" />
+        <ui:Toggle name="state-toggle" style="align-items: center; margin-bottom: 1px; margin-top: 1px; margin-right: 6px;" />
+        <ui:Label tabindex="-1" text="Prototype-1-Foldout" display-tooltip-when-elided="true" name="header-title" class="unity-foldout__header" style="-unity-text-align: middle-left;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="foldout-bag-container" />
+</ui:UXML>

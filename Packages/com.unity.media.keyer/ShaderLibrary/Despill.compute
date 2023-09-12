@@ -1,0 +1,30 @@
+﻿#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+
+#pragma kernel DespillGreen
+#pragma kernel DespillBlue
+#define GROUP_SIZE 16
+
+Texture2D<float4> _Input;
+RWTexture2D<float4> _Output;
+float _Amount;
+
+float4 Despill(float3 input)
+{
+    float3 suppressed = input.rgb;
+    suppressed.g = min(input.g, (input.r + input.b) * 0.5);
+    return float4(lerp(input.rgb, suppressed, _Amount), 1);
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void DespillGreen(uint3 id : SV_DispatchThreadID)
+{
+    _Output[id.xy] = Despill(SAMPLE_RGB(_Input, id.xy));
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void DespillBlue(uint3 id : SV_DispatchThreadID)
+{
+    float3 rbg = SAMPLE_RGB(_Input, id.xy).rbg;
+    float4 despilled = Despill(rbg);
+    _Output[id.xy] = despilled.rbga;
+}

@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:VisualElement name="new-object-field" style="flex-direction: row;">
+        <uie:ObjectField label="Settings" name="object-field" tooltip="Keyer Settings" style="flex-basis: 100%; flex-shrink: initial;" />
+        <ui:Button tabindex="-1" text="New" display-tooltip-when-elided="true" name="new-object-button" style="min-width: 50px;" />
+    </ui:VisualElement>
+</ui:UXML>

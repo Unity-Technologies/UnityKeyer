@@ -1,0 +1,17 @@
+#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+
+#pragma kernel BlendMax
+#define GROUP_SIZE 16
+
+Texture2D<float> _Foreground;
+Texture2D<float> _Background;
+RWTexture2D<float> _Output;
+float _Amount;
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void BlendMax(uint3 id : SV_DispatchThreadID)
+{
+    float foreground = SAMPLE_R(_Foreground, id.xy);
+    float background = SAMPLE_R(_Background, id.xy);
+    _Output[id.xy] = lerp(foreground, max(foreground, background), _Amount);
+}

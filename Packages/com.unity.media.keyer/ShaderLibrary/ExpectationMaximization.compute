@@ -1,0 +1,367 @@
+﻿// GRID_SIZE and GROUP_SIZE being equal is not required.
+#define GRID_SIZE 32
+#define GROUP_SIZE 32
+#define EPSILON 1e-4
+#define PI 3.14159265359
+
+#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+#include "Packages/com.unity.media.keyer/ShaderLibrary/AlgebraUtil.hlsl"
+
+#pragma enable_d3d11_debug_symbols
+
+#pragma kernel ResetColorBins
+#pragma kernel UpdateColorBins
+#pragma kernel ResetSelectedColorBins
+#pragma kernel SelectColorBins
+#pragma kernel InitializeCovariances
+#pragma kernel ProcessCovariances
+#pragma kernel UpdateIndirectArguments
+#pragma kernel UpdateWeightsAndCentroids
+#pragma kernel ReduceSumsAndCentroids
+#pragma kernel UpdateCovariances
+#pragma kernel ReduceCovariances
+#pragma kernel NormalizeCentroidsAndCovariances
+
+float2 _SourceSize;
+Texture2D<float3> _SourceTexture;
+RWStructuredBuffer<uint> _ColorBins;
+RWStructuredBuffer<uint2> _SelectedColorBins;
+AppendStructuredBuffer<uint2> _AppendSelectedColorBins;
+
+RWBuffer<uint> _IndirectBuffer;
+uint _IndirectArgsOffset;
+
+RWStructuredBuffer<float> _Weights;
+
+RWStructuredBuffer<float3> _CentroidsIn;
+RWStructuredBuffer<float3> _CentroidsOut;
+
+// We store matrices as a collection of rows.
+RWStructuredBuffer<float3> _CovariancesIn;
+RWStructuredBuffer<float3> _CovariancesOut;
+
+RWStructuredBuffer<float> _SumsIn;
+RWStructuredBuffer<float> _SumsOut;
+
+uint _NumClusters;
+
+// Optimization, we cache srqt of determinant reciprocals and covariance inverse.
+RWStructuredBuffer<float> _SqrtDetReciprocals;
+RWStructuredBuffer<float3> _InverseCovariances;
+
+float GaussianDensity(in float3 p, in float3 u, in float3x3 covInv, in float srqtDetReciprocal)
+{
+    float3 du = p - u;
+    static const float gNorm = 1.0 / pow(2 * PI, 1.5);
+    return gNorm * srqtDetReciprocal * exp(-0.5 * dot(mul(du, covInv), du));
+}
+
+float3 GetVoxelCenter(uint index)
+{
+    uint3 index3d = To3DIndex(index, GRID_SIZE);
+    return (index3d + (0.5).xxx) / (float)(GRID_SIZE).xxx;
+}
+
+[numthreads(GROUP_SIZE, 1 ,1)]
+void ResetColorBins(uint3 id : SV_DispatchThreadID)
+{
+    _ColorBins[id.x] = 0;
+}
+
+[numthreads(GROUP_SIZE, 1 ,1)]
+void ResetSelectedColorBins(uint3 id : SV_DispatchThreadID)
+{
+    _SelectedColorBins[id.x] = uint2(0, 0);
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void UpdateColorBins(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= (uint)_SourceSize.x || id.y >= (uint)_SourceSize.y)
+    {
+        return;
+    }
+
+    float3 sample = _SourceTexture[id.xy].rgb;
+    // min is here to prevent out-of-range indices for samples lying on the edges.
+    float3 normalized = min(sample, (0.9999).xxx);
+    // implicit floor.
+    uint3 index3d = normalized * GRID_SIZE;
+    uint index = To1DIndex(index3d, GRID_SIZE);
+    InterlockedAdd(_ColorBins[index], 1u);
+}
+
+[numthreads(GROUP_SIZE, 1 ,1)]
+void SelectColorBins(uint3 id : SV_DispatchThreadID)
+{
+    uint binSize = _ColorBins[id.x];
+    if (binSize > 0)
+    {
+        _AppendSelectedColorBins.Append(uint2(id.x, binSize));
+    }
+}
+
+[numthreads(GROUP_SIZE, 1 ,1)]
+void InitializeCovariances(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x > _NumClusters - 1)
+    {
+        return;
+    }
+
+    // Populate with identity-ish, somewhat empirical.
+    // Related to the expected "size" of a cluster in the color space.
+    float i = 0.2 / _NumClusters;
+    float e = i * 0.2;
+    _CovariancesIn[id.x * 2] = float3(i, e, e);
+    _CovariancesIn[id.x * 2 + 1] = float3(i, e, i);
+}
+
+// Precalculate data required to evaluate gaussian distribution.
+[numthreads(GROUP_SIZE, 1 ,1)]
+void ProcessCovariances(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x > _NumClusters - 1)
+    {
+        return;
+    }
+
+    float3x3 cov = ReadMatrixSymmetric3x3(_CovariancesIn, id.x);
+    float detReciprocal = 1.0 / DeterminantSymmetric(cov);
+    _SqrtDetReciprocals[id.x] = detReciprocal;
+    WriteMatrixSymmetric3x3(_InverseCovariances, id.x, InvertSymmetric(cov, detReciprocal));
+}
+
+groupshared uint gs_IndirectArgsGroups;
+
+// _IndirectBuffer holds arguments for processing selected voxels.
+// It contains (shrinking) args for reduction as well.
+// -> [[num-groups-x, 1, 1, input-count] ... [...]]
+// -> [[standard-args][args-for-reduce-step-2][args-for-reduce-step-3] ...]
+// (4 is more than we actually need for reduction, low cost, better safe than sorry.)
+#define INDIRECT_ARGS_THREADS 4
+[numthreads(INDIRECT_ARGS_THREADS, 1 ,1)]
+void UpdateIndirectArguments(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x == 0u)
+    {
+        gs_IndirectArgsGroups = _IndirectBuffer[0];
+    }
+
+    // Now that the count is available for all threads, let's proceed.
+    for (uint i = 0; i != INDIRECT_ARGS_THREADS; ++i)
+    {
+        GroupMemoryBarrierWithGroupSync();
+
+        if (id.x == i)
+        {
+            uint count = gs_IndirectArgsGroups;
+            gs_IndirectArgsGroups = ceil((float)gs_IndirectArgsGroups / GROUP_SIZE);
+
+            _IndirectBuffer[id.x * 4] = gs_IndirectArgsGroups;
+            _IndirectBuffer[id.x * 4 + 1] = 1;
+            _IndirectBuffer[id.x * 4 + 2] = 1;
+            _IndirectBuffer[id.x * 4 + 3] = count;
+        }
+    }
+}
+
+// Evaluate weights based on Gaussian Density. One thread per voxel.
+[numthreads(GROUP_SIZE, 1, 1)]
+void UpdateWeightsAndCentroids(uint3 id : SV_DispatchThreadID)
+{
+    uint dstIndex = id.x * _NumClusters;
+    uint2 indexAndSize = _SelectedColorBins[id.x];
+    float3 p = GetVoxelCenter(indexAndSize.x);
+    uint binSize = indexAndSize.y;
+    float sumWeights = 0;
+
+    {
+        [loop]
+        for (uint k = 0; k != _NumClusters; ++k)
+        {
+            float weight = max(EPSILON, GaussianDensity(p, _CentroidsIn[k], ReadMatrixSymmetric3x3(_InverseCovariances, k), _SqrtDetReciprocals[k]));
+            _Weights[dstIndex + k] = weight;
+            sumWeights += weight;
+        }
+    }
+
+    {
+        [loop]
+        for (uint k = 0; k != _NumClusters; ++k)
+        {
+            float weight = _Weights[dstIndex + k] / sumWeights;
+            float sum = weight * binSize;
+            _Weights[dstIndex + k] = weight;
+            _SumsOut[dstIndex + k] = sum;
+            _CentroidsOut[dstIndex + k] = p * sum;
+        }
+    }
+}
+
+groupshared uint gs_Count;
+groupshared float gs_Sums[GROUP_SIZE];
+groupshared float3 gs_Centroids[GROUP_SIZE];
+
+// Reduce centroids. Each thread processes all clusters.
+[numthreads(GROUP_SIZE, 1, 1)]
+void ReduceSumsAndCentroids(
+    uint3 threadId : SV_GroupThreadID,
+    uint3 groupId : SV_GroupID)
+{
+    #define groupIndex groupId.x
+    #define localThreadIndex threadId.x
+    uint globalThreadIndex = groupIndex * GROUP_SIZE + localThreadIndex;
+    uint srcIndex = globalThreadIndex * _NumClusters;
+    uint dstIndex = groupIndex * _NumClusters;
+
+    // Fetch input count;
+    // TODO Confirm it's better than poking _IndirectArgsOffset all the time.
+    if (localThreadIndex == 0u)
+    {
+        gs_Count = _IndirectBuffer[_IndirectArgsOffset + 3];
+    }
+
+    GroupMemoryBarrierWithGroupSync();
+
+    [loop]
+    for (uint k = 0; k != _NumClusters; ++k)
+    {
+        if (globalThreadIndex < gs_Count)
+        {
+            gs_Sums[localThreadIndex] = _SumsIn[srcIndex + k];
+            gs_Centroids[localThreadIndex] = _CentroidsIn[srcIndex + k];
+        }
+        else
+        {
+            gs_Sums[localThreadIndex] = 0;
+            gs_Centroids[localThreadIndex] = (0).xxx;
+        }
+
+        GroupMemoryBarrierWithGroupSync();
+
+        // Reduce local memory.
+        // See https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf
+        [unroll]
+        for (uint s = GROUP_SIZE / 2u; s > 0u; s >>= 1u)
+        {
+            if (localThreadIndex < s)
+            {
+                gs_Sums[localThreadIndex] += gs_Sums[localThreadIndex + s];
+                gs_Centroids[localThreadIndex] += gs_Centroids[localThreadIndex + s];
+            }
+
+            GroupMemoryBarrierWithGroupSync();
+        }
+
+        // write result for this block to global memory.
+        if (localThreadIndex == 0u)
+        {
+            _SumsOut[dstIndex + k] = gs_Sums[0];
+            _CentroidsOut[dstIndex + k] = gs_Centroids[0];
+        }
+    }
+}
+
+// Evaluate covariance matrices. One thread per voxel.
+[numthreads(GROUP_SIZE, 1, 1)]
+void UpdateCovariances(uint3 id : SV_DispatchThreadID)
+{
+    uint dstIndex = id.x * _NumClusters;
+    uint2 indexAndSize = _SelectedColorBins[id.x];
+    float3 p = GetVoxelCenter(indexAndSize.x);
+    float binSize = indexAndSize.y;
+
+    [loop]
+    for (uint k = 0; k != _NumClusters; ++k)
+    {
+        float weight = _Weights[dstIndex + k] * binSize;
+        float3 u = _CentroidsIn[k] / _SumsIn[k];
+        float3 dp = p - u;
+
+        float3 row0 = float3(dp.x * dp.x, dp.x * dp.y, dp.x * dp.z) * weight;
+        float3 row1 = float3(dp.y * dp.y, dp.y * dp.z, dp.z * dp.z) * weight;
+
+        _CovariancesOut[(dstIndex + k) * 2] = row0;
+        _CovariancesOut[(dstIndex + k) * 2 + 1] = row1;
+    }
+}
+
+groupshared float3 gs_Covariances[GROUP_SIZE * 2];
+
+// Reduce covariance matrices. Each thread processes all clusters.
+// We encode symmetric matrices using 2 float3 and take advantage of it here.
+[numthreads(GROUP_SIZE, 1, 1)]
+void ReduceCovariances(
+    uint3 threadId : SV_GroupThreadID,
+    uint3 groupId : SV_GroupID)
+{
+    #define groupIndex groupId.x
+    #define localThreadIndex threadId.x
+    uint globalThreadIndex = groupIndex * GROUP_SIZE + localThreadIndex;
+    uint srcIndex = globalThreadIndex * _NumClusters;
+    uint dstIndex = groupIndex * _NumClusters;
+
+    // Fetch input count;
+    // TODO Confirm it's better than poking _IndirectArgsOffset all the time.
+    if (localThreadIndex == 0u)
+    {
+        gs_Count = _IndirectBuffer[_IndirectArgsOffset + 3];
+    }
+
+    GroupMemoryBarrierWithGroupSync();
+
+    [loop]
+    for (uint k = 0; k != _NumClusters; ++k)
+    {
+        if (globalThreadIndex < gs_Count)
+        {
+            gs_Covariances[localThreadIndex * 2] = _CovariancesIn[(srcIndex + k) * 2];
+            gs_Covariances[localThreadIndex * 2 + 1] = _CovariancesIn[(srcIndex + k) * 2 + 1];
+        }
+        else
+        {
+            gs_Covariances[localThreadIndex * 2] = float3(0, 0, 0);
+            gs_Covariances[localThreadIndex * 2 + 1] = float3(0, 0, 0);
+        }
+
+        GroupMemoryBarrierWithGroupSync();
+
+        // Reduce local memory.
+        // See https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf
+        [unroll]
+        for (uint s = GROUP_SIZE / 2u; s > 0u; s >>= 1u)
+        {
+            if (localThreadIndex < s)
+            {
+                gs_Covariances[localThreadIndex * 2] += gs_Covariances[(localThreadIndex + s) * 2];
+                gs_Covariances[localThreadIndex * 2 + 1] += gs_Covariances[(localThreadIndex + s) * 2 + 1];
+            }
+
+            GroupMemoryBarrierWithGroupSync();
+        }
+
+        // write result for this block to global memory.
+        if (localThreadIndex == 0u)
+        {
+            _CovariancesOut[(dstIndex + k) * 2] = gs_Covariances[0];
+            _CovariancesOut[(dstIndex + k) * 2 + 1] = gs_Covariances[1];
+        }
+    }
+}
+
+// Normalize centroids and covariances. One thread per cluster.
+// Note that values are modified in place.
+[numthreads(GROUP_SIZE, 1, 1)]
+void NormalizeCentroidsAndCovariances(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x > _NumClusters - 1)
+    {
+        return;
+    }
+
+    float sumReciprocal = 1.0 / _SumsIn[id.x];
+    _CentroidsIn[id.x] *= sumReciprocal;
+    _CovariancesIn[id.x * 2] *= sumReciprocal;
+    _CovariancesIn[id.x * 2 + 1] *= sumReciprocal;
+}

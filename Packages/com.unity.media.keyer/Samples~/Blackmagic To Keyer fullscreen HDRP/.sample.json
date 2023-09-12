@@ -1,0 +1,5 @@
+{
+	"displayName":"HDRP Blackmagic to Keyer fullscreen",
+	"description": "Simple HDRP scene with a Blackmagic input used in the Keyer that displays the final result in the GameView (fullscreen)",
+	"createSeparatePackage": false
+}

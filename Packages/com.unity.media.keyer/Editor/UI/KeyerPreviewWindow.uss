@@ -1,0 +1,52 @@
+.ui-plot-info-label {
+    position: absolute;
+    height: 22px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    background-color: rgb(47, 47, 47);
+    border-left-color: rgb(159, 159, 159);
+    border-right-color: rgb(159, 159, 159);
+    border-top-color: rgb(159, 159, 159);
+    border-bottom-color: rgb(159, 159, 159);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    margin-top: 2px;
+    margin-right: 2px;
+    margin-left: 2px;
+}
+
+.ui-toolbar {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: -190px;
+    border-bottom-width: 1px;
+    border-top-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    align-self: center;
+}
+
+.ui-toolbar-container {
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: center;
+    align-self: center;
+    max-height: 20px;
+}
+
+.ui-display-field-border {
+    border-bottom-color: rgb(76,76,76);
+    border-bottom-width: 2px;
+}
+
+.ui-header-container {
+    flex-grow: 1;
+    flex-direction: row;
+    max-height: 32px;
+    height: 32px;
+    justify-content: center;
+}
