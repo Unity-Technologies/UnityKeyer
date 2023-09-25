@@ -1,0 +1,14 @@
+#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+
+#pragma kernel Clip
+#define GROUP_SIZE 16
+
+Texture2D<float> _Input;
+RWTexture2D<float> _Output;
+float2 _Range;
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void Clip(uint3 id : SV_DispatchThreadID)
+{
+    _Output[id.xy] = InvLerp(_Range.x, _Range.y, SAMPLE_R(_Input, id.xy));
+}

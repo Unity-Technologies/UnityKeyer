@@ -1,0 +1,27 @@
+{
+    "name": "Unity.Media.Keyer.Tests.Editor",
+    "rootNamespace": "Unity.Media.Keyer.Tests.Editor",
+    "references": [
+        "Unity.Media.Keyer",
+        "Unity.Media.Keyer.Editor",
+        "Unity.Media.Keyer.Tests",
+        "Unity.Mathematics",
+        "Unity.Collections"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "NSubstitute.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

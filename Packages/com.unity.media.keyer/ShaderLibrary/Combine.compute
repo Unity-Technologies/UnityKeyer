@@ -1,0 +1,14 @@
+﻿#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+
+#pragma kernel Combine
+#define GROUP_SIZE 16
+
+Texture2D<float3> _Color;
+Texture2D<float> _Alpha;
+RWTexture2D<float4> _Output;
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void Combine(uint3 id : SV_DispatchThreadID)
+{
+    _Output[id.xy] = float4(SAMPLE_RGB(_Color, id.xy), SAMPLE_R(_Alpha, id.xy));
+}

@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 949b0defc76f496a9e6d96e94ffd254e, type: 3}
+  m_Name: KeyerSettings
+  m_EditorClassIdentifier: 
+  m_Version: 0
+  m_OptionalPassFlags: 5
+  m_SegmentationAlgorithmCore: 0
+  m_SegmentationAlgorithmSoft: 0
+  m_ColorDifferenceCoreMask:
+    m_Enabled: 1
+    m_Scale: {x: 5, y: 5, z: 2.5}
+    m_ClipWhite: 1
+    m_ClipBlack: 0
+  m_ColorDifferenceSoftMask:
+    m_Enabled: 0
+    m_Scale: {x: 5, y: 5, z: 2.5}
+    m_ClipWhite: 1
+    m_ClipBlack: 0
+  m_ColorDistanceCoreMask:
+    m_Enabled: 1
+    m_ChromaKey: {r: 0, g: 1, b: 0, a: 1}
+    m_Threshold: {x: 0.1, y: 0.9}
+  m_ColorDistanceSoftMask:
+    m_Enabled: 0
+    m_ChromaKey: {r: 0, g: 1, b: 0, a: 1}
+    m_Threshold: {x: 0.1, y: 0.9}
+  m_Despill:
+    m_Enabled: 1
+    m_DespillAmount: 1
+  m_GarbageMask:
+    m_Enabled: 0
+    m_Mode: 0
+    m_Invert: 0
+    m_Texture: {fileID: 0}
+    m_Threshold: 0
+    m_Blend: 0
+    m_Points: []
+    m_SdfEnabled: 0
+    m_SdfQuality: 0
+    m_SdfDistance: 0
+  m_BlurMask:
+    m_Enabled: 1
+    m_Radius: 1
+    m_Quality: 16
+  m_ClipMask:
+    m_Enabled: 0
+    m_ClipWhite: 1
+    m_ClipBlack: 0.033333335
+  m_ErodeMask:
+    m_Enabled: 0
+    m_Amount: 1
+  m_CropMask:
+    m_Enabled: 0
+    m_Top: 0
+    m_Bottom: 0
+    m_Left: 0
+    m_Right: 0
+  m_BlendMask:
+    m_Enabled: 0
+    m_Strength: 1

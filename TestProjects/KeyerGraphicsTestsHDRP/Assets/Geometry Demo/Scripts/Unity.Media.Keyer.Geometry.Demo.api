@@ -1,0 +1,63 @@
+// This file is generated. Do not modify by hand.
+// XML documentation file not found. To check if public methods have XML comments,
+// make sure the XML doc file is present and located next to the scraped dll
+namespace Unity.Media.Keyer.Geometry.Demo
+{
+    public abstract class BasePolygon : UnityEngine.MonoBehaviour
+    {
+        protected BasePolygon() {}
+        public abstract Unity.Collections.NativeArray<Unity.Mathematics.float2> GetVerticesCcw();
+        public abstract void RegisterOnChanged(System.Action<BasePolygon> callback);
+        public abstract void UnregisterOnChanged(System.Action<BasePolygon> callback);
+    }
+
+    public abstract class BasePolygonConsumer : UnityEngine.MonoBehaviour
+    {
+        protected BasePolygonConsumer() {}
+        protected abstract void Execute(BasePolygon polygon);
+        protected virtual void OnDisable();
+        protected virtual void OnEnable();
+    }
+
+    [UnityEngine.ExecuteInEditMode] public class Polygon : BasePolygon
+    {
+        public Polygon() {}
+        public override Unity.Collections.NativeArray<Unity.Mathematics.float2> GetVerticesCcw();
+        public override void RegisterOnChanged(System.Action<BasePolygon> callback);
+        public override void UnregisterOnChanged(System.Action<BasePolygon> callback);
+    }
+
+    [UnityEngine.ExecuteInEditMode] public class PolygonGenerator : BasePolygon
+    {
+        public PolygonGenerator() {}
+        public override Unity.Collections.NativeArray<Unity.Mathematics.float2> GetVerticesCcw();
+        public override void RegisterOnChanged(System.Action<BasePolygon> callback);
+        public override void UnregisterOnChanged(System.Action<BasePolygon> callback);
+    }
+
+    public class SignedDistanceFieldDemo : UnityEngine.MonoBehaviour
+    {
+        public SignedDistanceFieldDemo() {}
+    }
+
+    [UnityEngine.ExecuteAlways] [UnityEngine.RequireComponent(typeof(PolygonGenerator))] public class SplitToMonotoneDemo : BasePolygonConsumer
+    {
+        public SplitToMonotoneDemo() {}
+        protected override void Execute(BasePolygon polygon);
+        protected override void OnDisable();
+    }
+
+    [UnityEngine.ExecuteAlways] [UnityEngine.RequireComponent(typeof(PolygonGenerator))] public class TriangulateMonotoneDemo : BasePolygonConsumer
+    {
+        public TriangulateMonotoneDemo() {}
+        protected override void Execute(BasePolygon polygon);
+        protected override void OnDisable();
+    }
+
+    [UnityEngine.ExecuteAlways] [UnityEngine.RequireComponent(typeof(PolygonGenerator))] [UnityEngine.RequireComponent(typeof(UnityEngine.MeshFilter))] public class TriangulatePolygonDemo : BasePolygonConsumer
+    {
+        public TriangulatePolygonDemo() {}
+        protected override void Execute(BasePolygon polygon);
+        protected override void OnDisable();
+    }
+}

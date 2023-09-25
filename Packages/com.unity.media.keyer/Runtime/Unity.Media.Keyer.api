@@ -1,0 +1,160 @@
+// This file is generated. Do not modify by hand.
+// XML documentation file not found. To check if public methods have XML comments,
+// make sure the XML doc file is present and located next to the scraped dll
+namespace Unity.Media.Keyer
+{
+    public enum BackgroundChannel
+    {
+        Blue = 1,
+        Green = 0,
+    }
+
+    public class BlendMaxNode
+    {
+        public bool Enabled { get; set; }
+        public float Strength { get; set; }
+        public BlendMaxNode() {}
+    }
+
+    public class Blur
+    {
+        public bool Enabled { get; set; }
+        public BlurQuality Quality { get; set; }
+        public float Radius { get; set; }
+        public Blur() {}
+    }
+
+    public enum BlurQuality
+    {
+        High = 16,
+        Low = 4,
+        Medium = 8,
+    }
+
+    public class Clip
+    {
+        public float ClipBlack { get; set; }
+        public float ClipWhite { get; set; }
+        public bool Enabled { get; set; }
+        public Clip() {}
+    }
+
+    public class ColorDifference
+    {
+        public BackgroundChannel BackgroundColor { get; set; }
+        public float ClipBlack { get; set; }
+        public float ClipWhite { get; set; }
+        public UnityEngine.Vector3 Scale { get; set; }
+        public ColorDifference() {}
+    }
+
+    public class ColorDistance
+    {
+        public UnityEngine.Color ChromaKey { get; set; }
+        public UnityEngine.Vector2 Threshold { get; set; }
+        public ColorDistance() {}
+    }
+
+    public class Crop
+    {
+        public float Bottom { get; set; }
+        public bool Enabled { get; set; }
+        public float Left { get; set; }
+        public float Right { get; set; }
+        public float Top { get; set; }
+        public Crop() {}
+    }
+
+    public class Despill
+    {
+        public BackgroundChannel BackgroundColor { get; set; }
+        public float DespillAmount { get; set; }
+        public bool Enabled { get; set; }
+        public Despill() {}
+    }
+
+    public class Erode
+    {
+        public float Amount { get; set; }
+        public bool Enabled { get; set; }
+        public Erode() {}
+    }
+
+    public class GarbageMask
+    {
+        public float Blend { get; set; }
+        public bool Enabled { get; set; }
+        public bool Invert { get; set; }
+        public GarbageMaskMode Mode { get; set; }
+        public int SdfDistance { get; set; }
+        public bool SdfEnabled { get; set; }
+        public SdfQuality SdfQuality { get; set; }
+        public UnityEngine.Texture Texture { get; set; }
+        public float Threshold { get; set; }
+        public GarbageMask() {}
+    }
+
+    public enum GarbageMaskMode
+    {
+        Polygon = 1,
+        Texture = 0,
+    }
+
+    public interface IKeyerAccess
+    {
+        public event System.Action Changed;
+        public Keyer GetKeyer();
+    }
+
+    [UnityEngine.AddComponentMenu(@"Keyer/Keyer")] [UnityEngine.ExecuteAlways] public class Keyer : UnityEngine.MonoBehaviour, IKeyerAccess
+    {
+        public Keyer.Display DisplayMode { get; set; }
+        public UnityEngine.Texture Foreground { get; set; }
+        public UnityEngine.RenderTexture Result { get; set; }
+        public KeyerSettings Settings { get; set; }
+        public Keyer() {}
+        public enum Display
+        {
+            BlendMax = 4,
+            CoreMatte = 1,
+            CropMatte = 8,
+            Despill = 7,
+            ErodeMatte = 3,
+            Front = 5,
+            GarbageMask = 6,
+            Result = 0,
+            SoftMatte = 2,
+        }
+    }
+
+    [UnityEngine.CreateAssetMenu(fileName = @"KeyerSettings", menuName = @"Virtual Production/KeyerSettings")] public class KeyerSettings : UnityEngine.ScriptableObject
+    {
+        public BlendMaxNode BlendMask { get; }
+        public ColorDifference ColorDifferenceCoreMask { get; }
+        public ColorDifference ColorDifferenceSoftMask { get; }
+        public ColorDistance ColorDistanceCoreMask { get; }
+        public ColorDistance ColorDistanceSoftMask { get; }
+        public Crop CropMask { get; }
+        public Despill Despill { get; }
+        public Erode ErodeMask { get; }
+        public GarbageMask GarbageMask { get; }
+        public SegmentationAlgorithm SegmentationAlgorithmCore { get; set; }
+        public SegmentationAlgorithm SegmentationAlgorithmSoft { get; set; }
+        public bool SoftMaskEnabled { get; set; }
+        public KeyerSettings() {}
+        public int GetSerializedFieldsHashCode();
+    }
+
+    public enum SdfQuality
+    {
+        High = 2,
+        Low = 0,
+        Mid = 1,
+    }
+
+    public enum SegmentationAlgorithm
+    {
+        ColorDifference = 0,
+        ColorDistance = 1,
+    }
+}

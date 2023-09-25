@@ -1,0 +1,15 @@
+{
+    "name": "Unity.Media.Keyer.Geometry.Demo",
+    "rootNamespace": "Unity.Media.Keyer.Geometry.Demo",
+    "references": [
+        "Unity.Media.Keyer",
+        "Unity.Mathematics"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "noEngineReferences": false
+}

@@ -1,0 +1,5 @@
+{
+	"displayName":"URP Keyer Multipass demo",
+	"description": "Simple URP scene with a multipass keyer",
+	"createSeparatePackage": false
+}

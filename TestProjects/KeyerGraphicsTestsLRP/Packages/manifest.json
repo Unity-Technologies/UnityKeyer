@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "com.unity.ide.rider": "3.0.16",
+    "com.unity.media.keyer": "file:../../../Packages/com.unity.media.keyer",
+    "com.unity.media.keyer.graphics-tests": "file:../../../Packages/com.unity.media.keyer.graphics-tests",
+    "com.unity.test-framework": "1.1.33",
+    "com.unity.modules.screencapture": "1.0.0"
+  }
+}

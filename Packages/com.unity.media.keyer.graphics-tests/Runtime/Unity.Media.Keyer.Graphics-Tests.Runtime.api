@@ -1,0 +1,95 @@
+// This file is generated. Do not modify by hand.
+// XML documentation file not found. To check if public methods have XML comments,
+// make sure the XML doc file is present and located next to the scraped dll
+namespace Unity.Media.Keyer.GraphicsTests
+{
+    public static class BinaryReaderExtensions
+    {
+        public static byte[] GetBytes(this System.IO.BinaryReader reader);
+        public static string GetString(this System.IO.BinaryReader reader, System.Text.Encoding encoding = default(System.Text.Encoding));
+    }
+
+    public static class BinaryWriterExtensions
+    {
+        public static void WriteBytes(this System.IO.BinaryWriter writer, byte[] value);
+        public static void WriteString(this System.IO.BinaryWriter writer, string value, System.Text.Encoding encoding = default(System.Text.Encoding));
+    }
+
+    public class FailedImageMessage
+    {
+        public byte[] ActualImage { get; set; }
+        public byte[] DiffImage { get; set; }
+        public byte[] ExpectedImage { get; set; }
+        public string ImageName { get; set; }
+        public static System.Guid MessageId { get; }
+        public string PathName { get; set; }
+        public FailedImageMessage() {}
+        public static FailedImageMessage Deserialize(byte[] data);
+        public byte[] Serialize();
+    }
+
+    public class Helpers
+    {
+        public const string k_ActualImagesRoot = @"Assets/ActualImages";
+        public const string k_ReferenceImagesRoot = @"Assets/ReferenceImages";
+        public Helpers() {}
+        public static void CompareKeyerResultAgainstReference(string referenceImageName, UnityEngine.RenderTexture keyerResult, ImageComparisonSettings settings);
+        public static UnityEngine.Texture2D ConvertRenderTextureToTexture2D(UnityEngine.RenderTexture renderTexture);
+        public static void CreateProceduralScene(string sceneName);
+        public static System.Collections.IEnumerator DoScreenCapture(UnityEngine.RenderTexture target);
+        public static UnityEngine.Texture2D LoadActualImage(string fileName);
+        public static UnityEngine.Texture2D LoadImage(string filePath);
+        public static UnityEngine.Texture2D LoadReferenceImage(string fileName);
+        public static bool SetupReferenceImageImportSettings(UnityEditor.TextureImporter textureImporter);
+    }
+
+    public class ImageAssert
+    {
+        public ImageAssert() {}
+        public static void AreEqual(UnityEngine.Texture2D expected, UnityEngine.Texture2D actual, ImageComparisonSettings settings = default(ImageComparisonSettings), bool saveFailedImage = true);
+        public static UnityEngine.Texture2D ResizeInto(UnityEngine.Texture2D source, UnityEngine.Texture2D dest);
+    }
+
+    public class ImageComparisonSettings : UnityEngine.MonoBehaviour
+    {
+        [UnityEngine.Tooltip(@"Determines which tests are active when comparing the images.")] public ImageComparisonSettings.ImageTests ActiveImageTests = ImageComparisonSettings.ImageTests.AverageDeltaE;
+        [UnityEngine.Tooltip(@"Determines which tests affect the counter used by the IncorrectPixelsCount image test.")] public ImageComparisonSettings.PixelTests ActivePixelTests = ImageComparisonSettings.PixelTests.None|ImageComparisonSettings.PixelTests.DeltaE|ImageComparisonSettings.PixelTests.DeltaAlpha|ImageComparisonSettings.PixelTests.DeltaGamma;
+        [UnityEngine.Tooltip(@"The maximum permitted average error value across the entire image.")] public float AverageCorrectnessThreshold;
+        [UnityEngine.Tooltip(@"The maximum ratio of pixels allowed to be incorrect across the image.")] public float IncorrectPixelsThreshold = 3.814697E-06f;
+        [UnityEngine.Tooltip(@"The permitted difference between the alpha component of individual pixels of the images.")] public float PerPixelAlphaThreshold = 0.003921569f;
+        [UnityEngine.Tooltip(@"The permitted perceptual difference between individual pixels of the images.")] public float PerPixelCorrectnessThreshold;
+        [UnityEngine.Tooltip(@"The permitted difference between the RGB components (in gamma) of individual pixels of the images.")] public float PerPixelGammaThreshold = 0.003921569f;
+        public ImageComparisonSettings() {}
+        [System.Flags] public enum ImageTests
+        {
+            AverageDeltaE = 1,
+            IncorrectPixelsCount = 2,
+            None = 0,
+            RMSE = 4,
+        }
+        [System.Flags] public enum PixelTests
+        {
+            DeltaAlpha = 2,
+            DeltaE = 1,
+            DeltaGamma = 4,
+            None = 0,
+        }
+    }
+
+    public class ImageHandler : UnityEditor.ScriptableSingleton<ImageHandler>
+    {
+        public string ImageResultsPath;
+        public ImageHandler() {}
+        public static void ReImportTextureWithSettings(string path, ImageHandler.TextureImporterSettings settings);
+        public void SaveImage(FailedImageMessage failedImageMessage, bool hdr = false, ImageHandler.TextureImporterSettings textureImporterSettings = default(ImageHandler.TextureImporterSettings));
+        public class TextureImporterSettings
+        {
+            public bool IsReadable { get; set; }
+            public UnityEditor.TextureImporterNPOTScale NPOTScale { get; set; }
+            public UnityEditor.TextureImporterCompression TextureCompressionType { get; set; }
+            public UnityEngine.FilterMode TextureFilterMode { get; set; }
+            public bool UseMipMaps { get; set; }
+            public TextureImporterSettings() {}
+        }
+    }
+}

@@ -1,0 +1,5 @@
+﻿{
+  "displayName":"Extract Keying Color Demo",
+  "description": "Demonstrate and test Keying Color Extraction.",
+  "createSeparatePackage": false
+}

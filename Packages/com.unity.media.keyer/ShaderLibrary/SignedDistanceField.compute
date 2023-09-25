@@ -1,0 +1,154 @@
+#pragma kernel Init
+#pragma kernel PropagateHorizontal
+#pragma kernel PropagateVertical
+#pragma kernel PropagateGroupShared
+#pragma kernel Final
+
+#define GROUP_SIZE 16
+
+Texture2D<float> _SourceInput;
+Texture2D<float> _Input;
+RWTexture2D<float> _Output;
+RWTexture2D<float> _FinalOutput;
+
+// Not grouped for they vary at different frequencies.
+float4 _TexelSize;
+float _Scale;
+uint _Jump;
+uint _Passes;
+int _Offset;
+
+// Blur.
+Buffer<float> _BlurWeights;
+uint _SampleCount;
+float _Radius;
+
+#define INF 2.0e8
+
+[numthreads(GROUP_SIZE, GROUP_SIZE, 1)]
+void Init(uint3 id : SV_DispatchThreadID)
+{
+    // 0 where filled, INF otherwise.
+    _Output[id.xy] = (1 - step(0.5, _SourceInput[id.xy].x)) * INF;
+}
+
+// Handle indices falling out of the input image.
+float SampleInput(in int2 position)
+{
+	int4 rectBoundsCrossing = int4(step(position, (0).xx), step(_TexelSize.xy, position));
+    // Note: early return cause "potentially uninitialized" warning on Metal.
+    float val = INF;
+    if (dot(rectBoundsCrossing, (1).xxxx) == 0)
+	{
+        val = _Input[position];
+	}
+	return val;
+}
+
+// We add a one pixel border and store 2 tiles in group shared memory so that we can ping pong.
+groupshared precise float gs_Tile[36][18];
+#define READ_TILE(xy) (gs_Tile[xy.x][xy.y])
+#define WRITE_TILE(xy, v) (gs_Tile[xy.x][xy.y] = v)
+
+void Swap(inout uint2 a, inout uint2 b)
+{
+	uint2 tmp = a;
+	a = b;
+	b = tmp;
+}
+
+void SwapAxes(inout uint2 a)
+{
+	uint tmp = a.x;
+	a.x = a.y;
+	a.y = tmp;
+}
+
+// This assumes a jump of one pixel.
+[numthreads(GROUP_SIZE, GROUP_SIZE, 1)]
+void PropagateGroupShared(uint3 threadId : SV_GroupThreadID, uint3 groupId : SV_GroupID)
+{
+    // Double buffering offsets.
+    uint2 srcOffset = uint2(0, 0);
+    uint2 dstOffset = uint2(GROUP_SIZE + 2, 0);
+
+	// First store the whole tile in group shared memory.
+	uint2 id = groupId.xy * (GROUP_SIZE).xx + threadId.xy;
+	uint2 tileId = threadId.xy + (1).xx;
+	// +1 as we take the border in account.
+	WRITE_TILE((tileId + srcOffset), INF); // TMP DEBUG
+	WRITE_TILE((tileId + dstOffset), SampleInput(id));
+
+	// Handle the tile border.
+	// Note that we must populate tile borders 2 times as we store 2 tiles.
+	// -1 if we're on the min border of the tile, 1 if we're on the max, 0 otherwise.
+    int xOffset = step(threadId.x, 0) * -1 + step(GROUP_SIZE - 1, threadId.x);
+    int yOffset = step(threadId.y, 0) * -1 + step(GROUP_SIZE - 1, threadId.y);
+	if (xOffset != 0)
+	{
+	    float s = SampleInput(id + int2(xOffset, 0));
+		WRITE_TILE((tileId + int2(xOffset, 0) + srcOffset), s);
+		WRITE_TILE((tileId + int2(xOffset, 0) + dstOffset), s);
+	}
+	if (yOffset != 0)
+	{
+	    float s = SampleInput(id + int2(0, yOffset));
+		WRITE_TILE((tileId + int2(0, yOffset) + srcOffset), s);
+		WRITE_TILE((tileId + int2(0, yOffset) + dstOffset), s);
+	}
+	if (xOffset * yOffset != 0)
+	{
+	    float s = SampleInput(id + int2(xOffset, yOffset));
+		WRITE_TILE((tileId + int2(xOffset, yOffset) + srcOffset), s);
+		WRITE_TILE((tileId + int2(xOffset, yOffset) + dstOffset), s);
+	}
+
+	uint2 offset = uint2(1, 0);
+
+	// Perform propagation within group shared memory.
+	for (uint i = 0; i != _Passes; ++i)
+	{
+	    GroupMemoryBarrierWithGroupSync();
+
+	    Swap(srcOffset, dstOffset);
+	    SwapAxes(offset);
+
+	    float self  = READ_TILE((tileId + srcOffset));
+    	float left  = READ_TILE((tileId + srcOffset - offset));
+    	float right = READ_TILE((tileId + srcOffset + offset));
+		WRITE_TILE((tileId + dstOffset), min(min(self, left + 1), right + 1));
+	}
+
+	// Commit result to global memory.
+    _Output[id.xy] = READ_TILE((tileId + dstOffset));
+}
+
+float Propagate(in uint2 id, in uint2 offset)
+{
+ 	float deltaSqrDist = _Jump * _Jump;
+
+    float self  = SampleInput(id);
+    float left  = SampleInput(id - offset * _Jump);
+    float right = SampleInput(id + offset * _Jump);
+
+	return min(min(self, left + deltaSqrDist), right + deltaSqrDist);
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE, 1)]
+void PropagateHorizontal(uint3 id : SV_DispatchThreadID)
+{
+    _Output[id.xy] = Propagate(id.xy, uint2(1, 0));
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE, 1)]
+void PropagateVertical(uint3 id : SV_DispatchThreadID)
+{
+    _Output[id.xy] = Propagate(id.xy, uint2(0, 1));
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE, 1)]
+void Final(uint3 id : SV_DispatchThreadID)
+{
+    _FinalOutput[id.xy] = 1 - saturate(sqrt(_Input[id.xy]) * _Scale);
+}
+

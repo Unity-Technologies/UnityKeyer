@@ -1,0 +1,16 @@
+{
+    "name": "com.unity.media.keyer.graphics-tests",
+    "version": "0.1.0",
+    "displayName": "Keyer Graphics Tests",
+    "description": "This package provides a framework to test the keyer",
+    "unity": "2022.2",
+    "dependencies": {
+      "com.unity.external.test-protocol": "1.0.1-preview"
+   },
+   "keywords": [
+      "unity",
+      "keyer",
+      "graphics",
+      "test"
+    ]
+  }

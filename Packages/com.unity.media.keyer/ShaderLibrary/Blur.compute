@@ -1,0 +1,37 @@
+﻿#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+
+#pragma kernel BlurHorizontal
+#pragma kernel BlurVertical
+#define GROUP_SIZE 16
+
+Texture2D<float> _Input;
+RWTexture2D<float> _Output;
+Buffer<float> _BlurWeights;
+int _SampleCount;
+float _Radius;
+
+float Blur(float2 uv, float2 direction, float2 texel)
+{
+    float result = 0;
+    for (int i = 0; i < _SampleCount; i++)
+    {
+        float offset = lerp(-_Radius, _Radius, float(i) / (_SampleCount - 1));
+        float2 offsetUV = uv + direction * offset * texel;
+        float sourceValue = _Input.SampleLevel(_LinearClamp, offsetUV, 0).r;
+        result += sourceValue * _BlurWeights[i];
+    }
+
+    return result;
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void BlurHorizontal(uint3 id : SV_DispatchThreadID)
+{
+    _Output[id.xy] = Blur((id.xy + (0.5).xx) * _TexelSize.zw, float2(1.0, 0.0), _TexelSize.zw);
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void BlurVertical(uint3 id : SV_DispatchThreadID)
+{
+    _Output[id.xy] = Blur((id.xy + (0.5).xx) * _TexelSize.zw, float2(0.0, 1.0), _TexelSize.zw);
+}
