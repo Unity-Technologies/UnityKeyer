@@ -1,0 +1,5 @@
+{
+	"displayName":"Keyer Video built-in",
+	"description": "Simple built-in scene with a video clip using the keyer",
+	"createSeparatePackage": false
+}

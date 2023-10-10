@@ -1,0 +1,78 @@
+﻿#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+
+#pragma kernel BlendId
+#pragma kernel PropagateId
+#define GROUP_SIZE 32
+
+// Id of the current curve.
+float _Id;
+// Source curve, R or RGB.
+Texture2D<float3> _SourceTexture;
+RWTexture2D<float> _IdTexture;
+RWTexture2D<float> _CoverageTexture;
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void BlendId(uint3 id : SV_DispatchThreadID)
+{
+    // We overwrite id if the new coverage is larger.
+    // We can modify in place as each pixel is only affected by a matching pixel in the source texture.
+    float3 srcColor = _SourceTexture[id.xy];
+    float coverage = max(srcColor.r, max(srcColor.g, srcColor.b));
+    float prevCoverage = _CoverageTexture[id.xy];
+
+    if (coverage > prevCoverage + 1e-6)
+    {
+        _CoverageTexture[id.xy] = coverage;
+        _IdTexture[id.xy] = _Id;
+    }
+}
+
+float2 _Size;
+Texture2D<float> _IdTextureIn;
+Texture2D<float> _CoverageTextureIn;
+RWTexture2D<float> _IdTextureOut;
+RWTexture2D<float> _CoverageTextureOut;
+
+// Here populated pixels propagate their value to their empty neighbors.
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void PropagateId(uint3 id : SV_DispatchThreadID)
+{
+    float currentId = _IdTextureIn[id.xy];
+
+    // We only propagate to empty pixels.
+    // Note: branch has spatial coherence.
+    if (currentId != 0)
+    {
+        // A simple copy.
+        _IdTextureOut[id.xy] = _IdTextureIn[id.xy];
+        _CoverageTextureOut[id.xy] = _CoverageTextureIn[id.xy];
+        return;
+    }
+
+    float currentCoverage = 0;
+
+    // 3x3 kernel.
+    // No need to worry about texcoords falling out of range, the GPU handles that for us.
+    // We use 2 unrolled loops to bypass index 4, which is the center pixel,
+    // which we know to be empty.
+    [unroll]
+    for (uint i = 0; i != 2; ++i)
+    [unroll]
+    for (uint j = 0; j != 4; ++j)
+    {
+        uint k = i * 5 + j;
+        int2 offset = int2(k % 3, k / 3) - (1).xx;
+        int2 pos = id.xy + offset;
+        float coverage = _CoverageTextureIn[pos];
+
+        // Most covered neighbor wins.
+        if (coverage > currentCoverage + 1e-6)
+        {
+            currentCoverage = coverage;
+            currentId = _IdTextureIn[pos];
+        }
+    }
+
+    _IdTextureOut[id.xy] = currentId;
+    _CoverageTextureOut[id.xy] = currentCoverage;
+}

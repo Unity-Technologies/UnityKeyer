@@ -1,0 +1,23 @@
+﻿{
+    "name": "Unity.Media.Keyer.Tests",
+    "rootNamespace": "Unity.Media.Keyer.Tests",
+    "references": [
+        "Unity.Mathematics",
+        "Unity.Burst",
+        "Unity.Media.Keyer",
+        "Unity.Collections"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

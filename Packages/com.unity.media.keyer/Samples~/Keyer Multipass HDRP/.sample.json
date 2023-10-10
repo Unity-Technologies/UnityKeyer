@@ -1,0 +1,5 @@
+{
+	"displayName":"HDRP Keyer Multipass demo",
+	"description": "Simple HDRP scene with a multipass keyer",
+	"createSeparatePackage": false
+}

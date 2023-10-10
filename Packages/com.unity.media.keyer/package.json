@@ -1,0 +1,73 @@
+{
+  "name": "com.unity.media.keyer",
+  "displayName": "Keyer",
+  "unity": "2022.2",
+  "version": "1.0.0",
+  "description": "The Keyer allows you to create an alpha mask from green screen images.",
+  "keywords": [
+    "unity",
+    "keyer",
+    "compositing",
+    "greenscreen",
+    "pass",
+    "layer"
+  ],
+  "dependencies": {
+    "com.unity.mathematics": "1.2.6",
+    "com.unity.burst": "1.7.1",
+    "com.unity.collections": "1.2.4",
+    "com.unity.modules.imageconversion": "1.0.0"
+  },
+  "samples": [
+    {
+      "displayName" : "HDRP Keyer Multipass demo",
+      "description" : "Simple HDRP scene with a multipass keyer",
+      "path" : "Samples~/Keyer Multipass HDRP"
+    },
+    {
+      "displayName" : "HDRP Keyer Video demo",
+      "description" : "Simple HDRP scene with a video clip using the keyer",
+      "path" : "Samples~/Keyer Video HDRP"
+    },
+    {
+      "displayName" : "URP Keyer Multipass demo",
+      "description" : "Simple URP scene with a multipass keyer",
+      "path" : "Samples~/Keyer Multipass URP"
+    },
+    {
+      "displayName" : "URP Keyer Video demo",
+      "description" : "Simple URP scene with a video clip using the keyer",
+      "path" : "Samples~/Keyer Video URP"
+    },
+    {
+      "displayName" : "Built-in Keyer Multipass demo",
+      "description" : "Simple built-in scene with a multipass keyer",
+      "path" : "Samples~/Keyer Multipass built-in"
+    },
+    {
+      "displayName" : "Built-in Keyer Video demo",
+      "description" : "Simple built-in scene with a video clip using the keyer",
+      "path" : "Samples~/Keyer Video built-in"
+    },
+    {
+      "displayName" : "HDRP Blackmagic to Plane keying and compositing demo",
+      "description" : "Simple HDRP scene with Blackmagic input to a plane with a multipass keyer",
+      "path" : "Samples~/Blackmagic To Keyer HDRP"
+    },
+    {
+      "displayName" : "URP Blackmagic to Plane keying and compositing demo",
+      "description" : "Simple URP scene with Blackmagic input to a plane with a multipass keyer",
+      "path" : "Samples~/Blackmagic To Keyer URP"
+    },
+    {
+      "displayName" : "HDRP Blackmagic to Keyer fullscreen",
+      "description" : "Simple HDRP scene with a Blackmagic input used in the Keyer that displays the final result in the GameView (fullscreen)",
+      "path" : "Samples~/Blackmagic To Keyer fullscreen HDRP"
+    },
+    {
+      "displayName" : "HDRP Blackmagic to Keyer fullscreen compositing",
+      "description" : "Simple HDRP scene with a Blackmagic input used in the Keyer. The final result is composited with the scene and displayed in the GameView",
+      "path" : "Samples~/Blackmagic to Keyer fullscreen compositing HDRP"
+    }
+  ]
+}

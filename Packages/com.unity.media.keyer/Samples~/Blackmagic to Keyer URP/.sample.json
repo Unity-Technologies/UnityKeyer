@@ -1,0 +1,5 @@
+{
+	"displayName":"URP Blackmagic to Plane with a Keyer demo",
+	"description": "Simple URP scene with Blackmagic input to a plane with a keyer",
+	"createSeparatePackage": false
+}

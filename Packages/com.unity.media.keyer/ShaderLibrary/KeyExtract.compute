@@ -1,0 +1,95 @@
+﻿#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+#pragma kernel Filter
+#pragma kernel Reduce
+#pragma multi_compile_local __ APPLY_GAMMA_TO_SOURCE
+
+Texture2D<float4> _SourceTexture;
+float4 _SourceTexelSize;
+RWStructuredBuffer<float3> _ColorsIn;
+RWStructuredBuffer<float3> _ColorsOut;
+uint _Count; // Total number of elements to process.
+
+// Pseudo random points in unit square.
+StructuredBuffer<float2> _SampleCoords;
+RWStructuredBuffer<float3> _Colors;
+
+float3 _KeyingColorRGB;
+int _BatchSize;
+
+[numthreads(32, 1, 1)]
+void Filter(uint3 id : SV_DispatchThreadID)
+{
+    float3 selectedColor;
+    float minDistance = 10;
+
+    for (int i = 0; i != _BatchSize; ++i)
+    {
+        float2 uv = _SampleCoords[_BatchSize * id.x + i];
+        float3 color = _SourceTexture.Load(int3(_SourceTexelSize.xy * uv, 0)).rgb;
+        #if APPLY_GAMMA_TO_SOURCE
+        color = LinearToGammaSpace(color);
+        #endif
+        float dist = SquareDistance(color, _KeyingColorRGB);
+
+        if (dist < minDistance)
+        {
+            minDistance = dist;
+            selectedColor = color;
+        }
+    }
+
+    _Colors[id.x] = selectedColor;
+}
+
+#define REDUCE_GROUP_SIZE 64
+// Group memory, faster access.
+groupshared float3 gs_Partial[REDUCE_GROUP_SIZE];
+
+[numthreads(REDUCE_GROUP_SIZE, 1, 1)]
+void Reduce(
+    uint3 threadId : SV_GroupThreadID,
+    uint3 groupId : SV_GroupID)
+{
+    #define groupIndex groupId.x
+    #define localThreadIndex threadId.x
+    uint globalThreadIndex = groupIndex * REDUCE_GROUP_SIZE + localThreadIndex;
+
+    // Copy to shared memory.
+    // Note that our last group may not be filled,
+    // and that leads to its elements having disproportionate impact on the result.
+    // We could correct that by keeping track of element counts.
+    // However in the present case the impact is low enough for us to ignore it.
+    if (globalThreadIndex < _Count)
+    {
+        gs_Partial[localThreadIndex] = _ColorsIn[globalThreadIndex];
+    }
+    else
+    {
+        gs_Partial[localThreadIndex] = (0).xxx;
+    }
+
+    GroupMemoryBarrierWithGroupSync();
+
+    // Reduce local memory.
+    // See https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf
+    [unroll]
+    for (uint s = REDUCE_GROUP_SIZE / 2u; s > 0u; s >>= 1u)
+    {
+        if (localThreadIndex < s)
+        {
+            gs_Partial[localThreadIndex] += gs_Partial[localThreadIndex + s];
+        }
+
+        GroupMemoryBarrierWithGroupSync();
+    }
+
+    // write result for this block to global memory.
+    if (localThreadIndex == 0u)
+    {
+        // Remember we may run more threads than items to process,
+        // the last group is the one affected.
+        float groupSize = min(REDUCE_GROUP_SIZE, _Count - groupIndex * REDUCE_GROUP_SIZE);
+        // We write one result per group.
+        _ColorsOut[groupIndex] = gs_Partial[0] / groupSize;
+    }
+}

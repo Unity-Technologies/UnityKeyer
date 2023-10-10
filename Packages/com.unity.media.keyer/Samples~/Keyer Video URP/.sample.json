@@ -1,0 +1,5 @@
+{
+	"displayName":"URP Keyer Video demo",
+	"description": "Simple URP scene with a video clip using the keyer",
+	"createSeparatePackage": false
+}

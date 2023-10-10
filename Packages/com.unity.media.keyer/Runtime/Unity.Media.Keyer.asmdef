@@ -1,0 +1,24 @@
+{
+    "name": "Unity.Media.Keyer",
+    "rootNamespace": "Unity.Media.Keyer",
+    "references": [
+        "Unity.Mathematics",
+        "Unity.Burst",
+        "Unity.Collections"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.media.blackmagic",
+            "expression": "1.0.0",
+            "define": "BLACKMAGIC_1_0_0_OR_NEWER"
+        }
+    ],
+    "noEngineReferences": false
+}

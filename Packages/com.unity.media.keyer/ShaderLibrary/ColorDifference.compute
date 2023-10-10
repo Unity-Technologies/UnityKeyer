@@ -1,0 +1,31 @@
+#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+
+#pragma kernel ColorDifferenceGreen
+#pragma kernel ColorDifferenceBlue
+#define GROUP_SIZE 16
+
+Texture2D<float3> _Input;
+RWTexture2D<float> _Output;
+
+float3 _Scale;
+float2 _Clip;
+
+float ColorDifference(float3 input, float3 scale)
+{
+    float a = input.y * scale.y - max(input.x * scale.x, input.z * scale.z);
+    return InvLerp(_Clip.x, _Clip.y, 1.0 - a);
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void ColorDifferenceGreen(uint3 id : SV_DispatchThreadID)
+{
+    const float3 input = SAMPLE_RGB(_Input, id.xy);
+    _Output[id.xy] = ColorDifference(input, _Scale);
+}
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void ColorDifferenceBlue(uint3 id : SV_DispatchThreadID)
+{
+    const float3 input = SAMPLE_RGB(_Input, id.xy).rbg;
+    _Output[id.xy] = ColorDifference(input, _Scale.rbg);
+}

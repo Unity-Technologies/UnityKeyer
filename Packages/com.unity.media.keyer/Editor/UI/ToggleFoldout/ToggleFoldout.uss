@@ -1,0 +1,48 @@
+.ToggleCondensed .unity-foldout-depth-0 {
+    flex-direction: row;
+    width: 100%;
+}
+
+.ToggleCondensed #dropdown-toggle {
+    display: none;
+}
+
+.ToggleCondensed #header-container {
+    min-width: 120px;
+    flex-direction: row-reverse;
+    overflow: hidden;
+    height: 20px;
+    margin-left: 3px;
+}
+
+.ToggleCondensed .unity-foldout-toggle-inspector {
+    flex-direction: row-reverse;
+}
+
+.ToggleCondensed #header-title {
+    -unity-text-align: middle-left;
+    align-content: flex-start;
+    width: auto;
+    flex-grow: 1;
+}
+
+.ToggleCondensed .unity-toggle {
+    margin-right: 3px;
+}
+
+.ToggleCondensed Toggle {
+    margin-right: 2px;
+}
+
+.ToggleCondensed .unity-base-slider__label {
+    display: none;
+}
+
+.ToggleCondensed #foldout-bag-container {
+    width: 100%;
+    margin-left: 3px;
+}
+
+.header-back-color {
+    background-color: rgba(43, 43, 43, 255);
+}

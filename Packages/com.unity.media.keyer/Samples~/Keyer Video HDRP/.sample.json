@@ -1,0 +1,5 @@
+{
+	"displayName":"HDRP Keyer Video demo",
+	"description": "Simple HDRP scene with a video clip using the keyer",
+	"createSeparatePackage": false
+}

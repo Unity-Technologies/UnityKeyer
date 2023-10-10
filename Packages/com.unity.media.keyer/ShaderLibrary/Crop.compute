@@ -1,0 +1,14 @@
+#include "Packages/com.unity.media.keyer/ShaderLibrary/CommonCompute.hlsl"
+
+#pragma kernel Crop
+#define GROUP_SIZE 16
+
+Texture2D<float> _Input;
+RWTexture2D<float> _Output;
+float4 _Rect;
+
+[numthreads(GROUP_SIZE, GROUP_SIZE ,1)]
+void Crop(uint3 id : SV_DispatchThreadID)
+{
+    _Output[id.xy] = SAMPLE_R(_Input, id.xy) * InsideRect(id.xy, _Rect.xy, _Rect.zw);
+}
