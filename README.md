@@ -1,13 +1,38 @@
-# About
-Use the Keyer to create an alpha mask from green screen images.
+# Chroma Keying with Unity Keyer
 
-<a name="Contents"></a>
-## Contents
-### Packages
-- **[Keyer](Packages/com.unity.media.keyer/README.md)**
-- **Keyer Graphics Tests: Tests framework to perform graphics tests on the Keyer**.
+With the Unity Keyer package (`com.unity.media.keyer`) create an alpha mask from green screen images.
 
-### Test projects 
+This repository contains the code package, the test package and test projects related with Unity Keyer.
+
+## Get started
+
+To learn about the Unity Keyer package (concepts, features, and workflows) read the [Keyer package documentation](Packages/com.unity.media.keyer/Documentation~/index.md) in this repository.
+For user convenience, an HTLM build is also available [here](Packages/com.unity.media.keyer/Built-documentation.zip).
+
+### Check out the licensing model
+
+The Keyer package is licensed under the [under the Apache License, Version 2.0 ](LICENSE.md).
+
+### Contribution and maintenance
+
+We appreciate your interest in contributing to the Unity Keyer package.   
+It's important to note that this package is provided as-is, without any maintenance or release plan.   
+As a result, we are unable to monitor bug reports, accept feature requests, or review pull requests for this package.
+
+However, we understand that users may want to make improvements to the package.    
+In that case, we recommend forking the repository. This allows you to make changes and enhancements as you see fit.
+
+## Keyer package
+
+### Access the Keyer package folder
+
+| Package                                     | Description                                                                   |
+|:--------------------------------------------|:------------------------------------------------------------------------------|
+| **[Keyer](Packages/com.unity.media.keyer)** | The package that allows you to create an alpha mask from green screen images. |
+
+### Test the Keyer package
+
+Use these Unity projects to run various tests against the Keyer  package.
 
 | Project                | Description                                                       |
 |------------------------|-------------------------------------------------------------------|
@@ -16,7 +41,8 @@ Use the Keyer to create an alpha mask from green screen images.
 | KeyerGraphicsTestsLRP  | Runs the pipelines tests on the Legacy (built-in) render pipeline |
 | KeyerGraphicsTestsURP  | Runs the pipelines tests with URP installed.                      |
 
-## Documentation
-Documentation for installing and using the Keyer package in the Unity Editor can be found in the Built-documentation.zip file available [here](https://github.com/Unity-Technologies/UnityKeyer/tree/setup/CST1372-Move-files-to-new-repo/Packages/com.unity.media.keyer).
+Additional test package available in this repository:
 
-Note:[ The Documentation~ folder](https://github.com/Unity-Technologies/UnityKeyer/tree/setup/CST1372-Move-files-to-new-repo/Packages/com.unity.media.keyer/Documentation~) includes the documentation sources in Markdown.
+|  Package                                                                  | Description                                                                   |
+|:--------------------------------------------------------------------------|:------------------------------------------------------------------------------|
+| **[Keyer Graphics Tests](Packages/com.unity.media.keyer.graphics-tests)** | The package that allows you to create an alpha mask from green screen images. |
