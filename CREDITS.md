@@ -1,10 +1,10 @@
-﻿# Contact and credits
+# Credits
 
 This page acknowledges those who have Contributed to this work in the past.
 
 ## Past contributors
 
-Thank you to all the people who have contributed to Unity's Keyer !
+Thank you to all the people who have contributed to Unity's Keyer!
 
 Top contributors:  
 [Jean Blouin](https://github.com/jeanblouin), [Etienne Cella](https://github.com/etienne-p)
