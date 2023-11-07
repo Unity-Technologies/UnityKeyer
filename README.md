@@ -1,6 +1,6 @@
 # Chroma Keying with the Unity Editor
 
-Use the Unity Keyer package (`com.unity.media.keyer`) to create an alpha mask from green screen images.
+Use the Unity Keyer package (`com.unity.media.keyer`) to create an alpha mask from green screen images in the Unity Editor.
 
 This repository contains the code package, the test package and test projects related with Unity Keyer.
 
