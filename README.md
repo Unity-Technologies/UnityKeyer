@@ -11,7 +11,7 @@ For user convenience, an HTML build is also available [in a zip file](Packages/c
 
 ### Check out the licensing model
 
-The Keyer package is licensed under the [under the Apache License, Version 2.0](LICENSE.md).
+The Keyer package is licensed under the [Apache License, Version 2.0](LICENSE.md).
 
 ### Contribution and maintenance
 
@@ -45,4 +45,4 @@ These test projects use an additional internal package available in this reposit
 
 | Package | Description |
 | :--- | :--- |
-| **[Keyer Graphics Tests](Packages/com.unity.media.keyer.graphics-tests)** | The package that allows you to create an alpha mask from green screen images. |
+| **[Keyer Graphics Tests](Packages/com.unity.media.keyer.graphics-tests)** | Includes all the graphics tests required by the test projects listed above. |
