@@ -1,9 +1,8 @@
-# KEYER
+# Keyer package
 
-Use the Keyer to create an alpha mask from green screen images.
+Use the Keyer package to create an alpha mask from green screen images in the Unity Editor.
 
-## Installation and use
+For more information (installation, concepts, features, and workflows) read the [Keyer package documentation](Documentation~/index.md) in this repository.  
+>**Note:** The `Documentation~` folder includes the documentation sources in Markdown. For user convenience, an HTML build is also available [in a zip file](Built-documentation.zip). Download it, unzip it locally, and open the `index.html` file.
 
-To get instructions about installing and using the Keyer package in the Unity Editor, download the [`Built-documentation.zip`](Built-documentation.zip) file available in this folder, unzip it locally, and open the `index.html` file.
-
->**Note:** The `Documentation~` folder includes the documentation sources in Markdown.
+Review the specific [license terms](LICENSE.md) about this package.
