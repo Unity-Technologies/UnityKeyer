@@ -1,3 +1,5 @@
+[Home](index.md)
+
 # Getting started
 
 In this section, you can find information to help you accomplish the following tasks:

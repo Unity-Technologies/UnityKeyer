@@ -1,3 +1,5 @@
+[Home](index.md) | [Getting started](getting-started.md)
+
 # Creating a default Keyer
 
 You can create a default Keyer in one step. To create a default Keyer:
@@ -11,7 +13,7 @@ You can create a default Keyer in one step. To create a default Keyer:
  * **Keyer Container**: The parent object hosting the Keyer and the Keyer shadow. You can move this object rather than the children.
  * **Keyer**: Quad containing the actual Keyer. You can change the Keyer component settings in this GameObject.
  * **Keyer Shadow**: The shadow of the Keyer. The shadow is created by using a Quad located in the same location as the Quad on which the Keyer component is applied. This uses a mesh renderer that only casts shadows, with an opaque material with an alpha cutout.<br />
-  
+
 2. Optionally, change the input Foreground green screen texture to your own.
 
 3. Optionally, provide a Garbage Mask texture.
