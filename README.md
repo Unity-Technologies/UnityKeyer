@@ -6,8 +6,7 @@ This repository contains the code package, the test package and test projects re
 
 ## Get started
 
-To learn about the Unity Keyer package (concepts, features, and workflows) read the [Keyer package documentation](Packages/com.unity.media.keyer/Documentation~/index.md) in this repository.  
-For user convenience, an HTML build is also available [in a zip file](Packages/com.unity.media.keyer/Built-documentation.zip).
+To learn about the Unity Keyer package (concepts, features, and workflows) read the [Keyer package documentation](Packages/com.unity.media.keyer/Documentation~/index.md) in this repository.
 
 ### Check out the licensing model
 
