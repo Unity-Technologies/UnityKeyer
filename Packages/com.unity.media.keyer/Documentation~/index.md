@@ -1,11 +1,11 @@
 # Keyer package
 
+![keyer](images/keyer.png)
+
 >[!NOTE]
 >To use the Keyer package, you must install it separately. For detailed information about package requirements and installation instructions, refer to [Installation](installation.md).
 
 The **Keyer** package allows you to create an opacity mask for actors or objects filmed against a green screen.
-
-![keyer](images/keyer.png)
 
 ## In this documentation
 
