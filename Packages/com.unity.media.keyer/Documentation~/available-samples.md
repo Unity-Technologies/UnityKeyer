@@ -1,6 +1,8 @@
+[Contents](TableOfContents.md) | [Home](index.md) > [Samples](samples.md) > Available samples
+
 # Available samples
 
-The following samples are available for the Keyer. 
+The following samples are available for the Keyer.
 
 | **Sample:**      | **Description:**               |
 | :----------------- | :-------------------------- |

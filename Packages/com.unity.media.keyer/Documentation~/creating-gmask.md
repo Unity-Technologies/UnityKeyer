@@ -1,6 +1,8 @@
+[Contents](TableOfContents.md) | [Home](index.md) > [Getting started](getting-started.md) > Creating a Garbage Mask
+
 # Creating a Garbage Mask
 
-You can use a Garbage Mask to hide or mask out a specific area of an input image. 
+You can use a Garbage Mask to hide or mask out a specific area of an input image.
 You can use either a Texture or draw a Polygon shape to create a Garbage Mask.
 
 ## Texture Garbage Mask
