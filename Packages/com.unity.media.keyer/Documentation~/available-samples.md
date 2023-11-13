@@ -1,4 +1,4 @@
-[Home](index.md) | [Samples](samples.md)
+[Contents](TableOfContents.md) | [Home](index.md) > [Samples](samples.md) > Available samples
 
 # Available samples
 

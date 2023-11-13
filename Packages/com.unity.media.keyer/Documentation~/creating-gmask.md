@@ -1,4 +1,4 @@
-[Home](index.md) | [Getting started](getting-started.md)
+[Contents](TableOfContents.md) | [Home](index.md) > [Getting started](getting-started.md) > Creating a Garbage Mask
 
 # Creating a Garbage Mask
 

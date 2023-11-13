@@ -1,4 +1,4 @@
-[Home](index.md) | [Getting started](getting-started.md)
+[Contents](TableOfContents.md) | [Home](index.md) > [Getting started](getting-started.md) > Using the Keyer Preview Window
 
 # Using the Keyer Preview Window
 

@@ -1,4 +1,4 @@
-[Home](index.md)
+[Contents](TableOfContents.md) | [Home](index.md) > Getting started
 
 # Getting started
 
